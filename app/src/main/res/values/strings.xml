@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Enroll</string>
+    <string-array name="tgroup">
+        <item>Dressmaking</item>
+        <item>Civic Education</item>
+    </string-array>
+</resources>
