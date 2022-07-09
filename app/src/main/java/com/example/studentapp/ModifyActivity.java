@@ -1,7 +1,10 @@
 package com.example.studentapp;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -12,8 +15,13 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class ModifyActivity extends AppCompatActivity {
@@ -24,6 +32,7 @@ public class ModifyActivity extends AppCompatActivity {
     String tg;
 
     DatabaseHelper myDB;
+    FirebaseFirestore cloudDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +41,7 @@ public class ModifyActivity extends AppCompatActivity {
 
 
         myDB = new DatabaseHelper(this);  // created object of DatabaseHelper class
-        //myDB.getWritableDatabase(); // for checking db is created or not.
+        cloudDB = FirebaseFirestore.getInstance();
 
         btnInsertData = findViewById(R.id.btnInsertData);
         btnDeleteData = findViewById(R.id.btnDeleteData);
@@ -144,7 +153,20 @@ public class ModifyActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Integer isDeleted  = myDB.deleteData(name.getText().toString());
-
+                cloudDB.document("students/"+name.getText().toString())
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error deleting document", e);
+                            }
+                        });
                 if(isDeleted > 0){
                     Toast.makeText(ModifyActivity.this, "Data Deleted", Toast.LENGTH_SHORT).show();
                 }else{

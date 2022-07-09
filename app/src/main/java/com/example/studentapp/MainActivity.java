@@ -1,18 +1,31 @@
 package com.example.studentapp;
+
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends Activity {
@@ -22,13 +35,14 @@ public class MainActivity extends Activity {
 
     Button btnDm, btnCe,btnAdd;
     DatabaseHelper myDB;
+    FirebaseFirestore cloudDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         myDB = new DatabaseHelper(this);
-
+        cloudDB = FirebaseFirestore.getInstance();
 
         setContentView(R.layout.recyclerview_activity);
 
@@ -66,8 +80,11 @@ public class MainActivity extends Activity {
 
 
         initializeData();
-//        initializeAdapter();
         viewByDM();
+
+        if(isNetworkAvailable()){
+            sendDataToCloud(cloudDB);
+        }
 
     }
 
@@ -86,6 +103,38 @@ public class MainActivity extends Activity {
             persons.add(new Person(cur.getString(1), cur.getString(2), cur.getString(3), cur.getString(4)));
         }
 
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void sendDataToCloud(FirebaseFirestore cloudDB){
+
+        Map<String,Object> dataList = new HashMap<>();
+        for (Person person:persons) {
+            dataList.put("Student Name",person.name);
+            dataList.put("Training Group",person.tg);
+            dataList.put("Priority", person.pr);
+            dataList.put("Progress",person.pg);
+            cloudDB.document("students/"+person.name)
+                    .set(dataList)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Log.d(TAG, "DocumentSnapshot added");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error adding document", e);
+                        }
+                    });
+        }
     }
 
     private void viewByDM(){
