@@ -1,6 +1,4 @@
 package com.example.studentapp;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -8,6 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
@@ -78,11 +79,15 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
         }
 
         final String Sname = persons.get(i).name;
+        final String Stg = persons.get(i).tg;
+        final String id = Integer.toString(persons.get(i).id);
         personViewHolder.cardV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(),ModifyActivity.class);
                 intent.putExtra("name",Sname);
+                intent.putExtra("tg",Stg);
+                intent.putExtra("id",id);
                 view.getContext().startActivity(intent);
             }
         });

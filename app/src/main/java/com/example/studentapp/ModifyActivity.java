@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,6 +24,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 
 public class ModifyActivity extends AppCompatActivity {
 
@@ -30,17 +34,18 @@ public class ModifyActivity extends AppCompatActivity {
     EditText name;
     RadioGroup pg,pr;
     String tg;
+    int id;
 
     DatabaseHelper myDB;
     FirebaseFirestore cloudDB;
+    boolean spinnerTouched = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        myDB = new DatabaseHelper(this);  // created object of DatabaseHelper class
+        myDB = new DatabaseHelper(this);
         cloudDB = FirebaseFirestore.getInstance();
 
         btnInsertData = findViewById(R.id.btnInsertData);
@@ -49,6 +54,7 @@ public class ModifyActivity extends AppCompatActivity {
         btnReadData = findViewById(R.id.btnReadData);
 
         final Spinner spinner = (Spinner) findViewById(R.id.textTG);
+
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.tgroup, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -67,6 +73,16 @@ public class ModifyActivity extends AppCompatActivity {
                     }
 
                 });
+        spinner.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    spinnerTouched = true;
+                }
+
+                return false;
+            }
+        });
         name = findViewById(R.id.textName);
         pg = findViewById(R.id.textProgress);
         pr = findViewById(R.id.textPR);
@@ -83,10 +99,12 @@ public class ModifyActivity extends AppCompatActivity {
                 radioButton= findViewById (selectedItem);
                 String pfb = radioButton.getText().toString();
 
+                String time = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date());
                 boolean isInserted = myDB.insertData(name.getText().toString(),tg,pgb,pfb);
+                boolean isInsertedR = myDB.insertRecord(name.getText().toString(),time,"1","0",tg,"0",pgb,"0",pfb,"0");
 
                 // Show toast when data inserted successfully
-                if(isInserted){
+                if(isInserted && isInsertedR){
                     Toast.makeText(ModifyActivity.this, "Data Inserted", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(ModifyActivity.this, "Data Not Inserted", Toast.LENGTH_SHORT).show();
@@ -104,18 +122,6 @@ public class ModifyActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(ModifyActivity.this, MainActivity.class);
-//                Cursor cur = myDB.getAllData();
-//                if(cur.getCount() == 0){
-//                    showMessage("Error","No Data Found");
-//                    return;
-//                }
-//                List<Person> persons = new ArrayList<>();
-//
-//                while (cur.moveToNext()){
-//                    persons.add(new Person(cur.getString(1), cur.getString(2), cur.getString(3), cur.getString(4)));
-//                }
-//
-//                myIntent.putExtra("data", (Serializable) persons);
                 ModifyActivity.this.startActivity(myIntent);
             }
         });
@@ -133,17 +139,39 @@ public class ModifyActivity extends AppCompatActivity {
                 int selectedItem= pg.getCheckedRadioButtonId();
                 RadioButton radioButton= findViewById (selectedItem);
                 String pgb = radioButton.getText().toString();
+
+                if(pgb.isEmpty() ){
+                    showMessage("Error","Please fill the all fields to Updating");
+                    return;
+                }
+
                 selectedItem= pr.getCheckedRadioButtonId();
                 radioButton= findViewById (selectedItem);
                 String pfb = radioButton.getText().toString();
 
-                boolean isUpdated = myDB.updateData(name.getText().toString(), tg, pgb,pfb);
+                if(pfb.isEmpty() ){
+                    showMessage("Error","Please fill the all fields to Updating");
+                    return;
+                }
 
-                if(isUpdated){
+                boolean isUpdatedR;
+                String time = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date());
+                if(spinnerTouched){
+                    isUpdatedR = myDB.insertRecord(name.getText().toString(),time,"0","0",tg,"1",pgb,"1",pfb,"1");
+                }else{
+                    isUpdatedR = myDB.insertRecord(name.getText().toString(),time,"0","0",tg,"0",pgb,"1",pfb,"1");
+                }
+
+
+                boolean isUpdated = myDB.updateData(id,name.getText().toString(), tg, pgb,pfb);
+
+
+                if(isUpdated && isUpdatedR ){
                     Toast.makeText(ModifyActivity.this, "Data Updated", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(ModifyActivity.this, "Data Not Updated", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
 
@@ -152,7 +180,7 @@ public class ModifyActivity extends AppCompatActivity {
         btnDeleteData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Integer isDeleted  = myDB.deleteData(name.getText().toString());
+                Integer isDeleted  = myDB.deleteData(id);
                 cloudDB.document("students/"+name.getText().toString())
                         .delete()
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -167,7 +195,12 @@ public class ModifyActivity extends AppCompatActivity {
                                 Log.w(TAG, "Error deleting document", e);
                             }
                         });
-                if(isDeleted > 0){
+
+                String time = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date());
+                boolean isInsertedR = myDB.insertRecord(name.getText().toString(),time,"0","1",null,"0",null,"0",null,"0");
+
+                // Show toast when data inserted successfully
+                if(isDeleted > 0 && isInsertedR){
                     Toast.makeText(ModifyActivity.this, "Data Deleted", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(ModifyActivity.this, "Data Not Deleted", Toast.LENGTH_SHORT).show();
@@ -178,8 +211,21 @@ public class ModifyActivity extends AppCompatActivity {
 
         Intent intent = new Intent(getIntent());
         String sname = intent.getStringExtra("name");
+        String stg = intent.getStringExtra("tg");
+        String sid = intent.getStringExtra("id");
+        if(!sid.isEmpty()){
+            id = Integer.parseInt(intent.getStringExtra("id"));
+        }
         if(!sname.isEmpty()){
             name.setText(sname);
+        }
+        if(!stg.isEmpty()){
+            if(stg.equals("Dressmaking")){
+                spinner.setSelection(0);
+            }else{
+                spinner.setSelection(1);
+            }
+
         }
 
     }
