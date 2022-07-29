@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--    android:background="#6A6A6A"-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="#ffffff">
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:text="Congo Connect"
+        android:textColor="@android:color/black"
+        android:textSize="35sp"
+        android:textStyle="bold|italic"
+        />
+
+    <ImageView
+        android:id="@+id/header_image"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:layout_below="@id/label"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/logo"
+        android:layout_centerHorizontal="true"/>
+
+    <LinearLayout
+        android:id="@+id/TopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:orientation="vertical"
+        android:layout_below="@+id/header_image"
+        android:layout_centerHorizontal="true">
+
+        <EditText
+            android:id="@+id/textUserName"
+            android:elevation="10dp"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/border"
+            android:ems="10"
+            android:hint=" Enter User Name... "
+            android:padding="5dp"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/Login"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp"
+            android:layout_gravity="center"
+            android:elevation="40dp"
+            android:text="Log in"/>
+
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>
