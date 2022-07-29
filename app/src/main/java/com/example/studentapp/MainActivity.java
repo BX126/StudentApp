@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -39,12 +40,14 @@ public class MainActivity extends Activity {
 
     private List<Person> persons;
     private RecyclerView rv;
+    private String userName;
 
 
     Button btnDm, btnCe, btnAdd, btnSync;
     DatabaseHelper myDB;
     FirebaseFirestore cloudDB;
     FirebaseStorage cloudStore;
+    ImageView logo;
 
 
     @Override
@@ -65,6 +68,15 @@ public class MainActivity extends Activity {
         btnCe = findViewById(R.id.ceP);
         btnAdd = findViewById(R.id.Add);
         btnSync = findViewById(R.id.Sync);
+        logo = findViewById(R.id.header_image);
+
+        logo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(MainActivity.this, LoginActivity.class);
+                MainActivity.this.startActivity(myIntent);
+            }
+        });
 
         btnDm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -120,8 +132,9 @@ public class MainActivity extends Activity {
 
                 StorageReference storageRef = cloudStore.getReference();
                 String time = java.text.DateFormat.getDateTimeInstance().format(new Date());
-                String name = time+ ".csv";
-//                String name = "Ben/"+ time+ ".csv";
+                Intent intent = new Intent(getIntent());
+                userName = intent.getStringExtra("User");
+                String name = userName+ "/" + time+ ".csv";
                 StorageReference mountainsRef = storageRef.child(name);
                 UploadTask uploadTask = mountainsRef.putBytes(data);
                 uploadTask.addOnFailureListener(new OnFailureListener() {
@@ -142,12 +155,13 @@ public class MainActivity extends Activity {
         });
 
 
+
         initializeData();
         viewByDM();
 
-//        if(isNetworkAvailable()){
-//            sendDataToCloud(cloudDB);
-//        }
+        if(isNetworkAvailable()){
+            sendDataToCloud(cloudDB);
+        }
 
     }
 

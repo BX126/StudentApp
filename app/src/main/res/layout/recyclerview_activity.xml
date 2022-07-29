@@ -11,10 +11,9 @@
         android:id="@+id/label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/btnbgcolor"
         android:gravity="center"
-        android:text="Enroll Management"
-        android:textColor="@android:color/white"
+        android:text="Congo Connect"
+        android:textColor="@android:color/black"
         android:textSize="26sp"
         android:textStyle="bold|italic" />
 
@@ -25,7 +24,6 @@
         android:layout_below="@+id/label"
         android:layout_marginTop="-26dp"
         android:src="@drawable/icon" />
-
 
     <LinearLayout
         android:id="@+id/TopBar"
