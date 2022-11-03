@@ -5,15 +5,11 @@ import static android.content.ContentValues.TAG;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,11 +26,12 @@ import java.util.Date;
 
 public class ModifyActivity extends AppCompatActivity {
 
-    Button btnInsertData, btnDeleteData, btnUpdateData, btnReadData;
+    Button btnInsertData, btnDeleteData, btnUpdateData, btnReadData,btnBack;
     EditText name;
-    RadioGroup pg,pr;
-    String tg;
+    RadioGroup tg, pg,pr;
+//    String tg;
     int id;
+    String username;
 
     DatabaseHelper myDB;
     FirebaseFirestore cloudDB;
@@ -43,7 +40,7 @@ public class ModifyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main2);
 
         myDB = new DatabaseHelper(this);
         cloudDB = FirebaseFirestore.getInstance();
@@ -51,39 +48,50 @@ public class ModifyActivity extends AppCompatActivity {
         btnInsertData = findViewById(R.id.btnInsertData);
         btnDeleteData = findViewById(R.id.btnDeleteData);
         btnUpdateData = findViewById(R.id.btnUpdateData);
-        btnReadData = findViewById(R.id.btnReadData);
+        btnBack = findViewById(R.id.Backtohome);
 
-        final Spinner spinner = (Spinner) findViewById(R.id.textTG);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.tgroup, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener() {
-
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        tg = String.valueOf(adapterView.getItemAtPosition(i));
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-
-                    }
-
-                });
-        spinner.setOnTouchListener(new View.OnTouchListener() {
+        btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    spinnerTouched = true;
-                }
-
-                return false;
+            public void onClick(View view) {
+                Intent myIntent = new Intent(ModifyActivity.this, HomeActivity.class);
+                myIntent.putExtra("User", username);
+                ModifyActivity.this.startActivity(myIntent);
             }
         });
+//        btnReadData = findViewById(R.id.btnReadData);
+
+//        final Spinner spinner = (Spinner) findViewById(R.id.textTG);
+//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+//                R.array.tgroup, android.R.layout.simple_spinner_item);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinner.setAdapter(adapter);
+//        spinner.setOnItemSelectedListener(
+//                new AdapterView.OnItemSelectedListener() {
+//
+//                    @Override
+//                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+//                        tg = String.valueOf(adapterView.getItemAtPosition(i));
+//                    }
+//
+//                    @Override
+//                    public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//                    }
+//
+//                });
+//        spinner.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+//                    spinnerTouched = true;
+//                }
+//
+//                return false;
+//            }
+//        });
         name = findViewById(R.id.textName);
+        tg = findViewById(R.id.textTG);
         pg = findViewById(R.id.textProgress);
         pr = findViewById(R.id.textPR);
 
@@ -91,17 +99,20 @@ public class ModifyActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Insert data into database
-
                 int selectedItem= pg.getCheckedRadioButtonId();
                 RadioButton radioButton= findViewById (selectedItem);
                 String pgb = radioButton.getText().toString();
                 selectedItem= pr.getCheckedRadioButtonId();
                 radioButton= findViewById (selectedItem);
                 String pfb = radioButton.getText().toString();
+                selectedItem= tg.getCheckedRadioButtonId();
+                radioButton= findViewById (selectedItem);
+                String tgb = radioButton.getText().toString();
+
 
                 String time = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date());
-                boolean isInserted = myDB.insertData(name.getText().toString(),tg,pgb,pfb);
-                boolean isInsertedR = myDB.insertRecord(name.getText().toString(),time,"1","0",tg,"0",pgb,"0",pfb,"0");
+                boolean isInserted = myDB.insertData(name.getText().toString(),tgb,pgb,pfb);
+                boolean isInsertedR = myDB.insertRecord(name.getText().toString(),time,"1","0",tgb,"0",pgb,"0",pfb,"0");
 
                 // Show toast when data inserted successfully
                 if(isInserted && isInsertedR){
@@ -114,17 +125,22 @@ public class ModifyActivity extends AppCompatActivity {
                 name.setText("");
                 pg.clearCheck();
                 pr.clearCheck();
-            }
-        });
 
-
-        btnReadData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
                 Intent myIntent = new Intent(ModifyActivity.this, MainActivity.class);
+                myIntent.putExtra("User", username);
                 ModifyActivity.this.startActivity(myIntent);
             }
         });
+
+
+//        btnReadData.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent myIntent = new Intent(ModifyActivity.this, MainActivity.class);
+//                myIntent.putExtra("User", username);
+//                ModifyActivity.this.startActivity(myIntent);
+//            }
+//        });
 
 
         btnUpdateData.setOnClickListener(new View.OnClickListener() {
@@ -141,7 +157,7 @@ public class ModifyActivity extends AppCompatActivity {
                 String pgb = radioButton.getText().toString();
 
                 if(pgb.isEmpty() ){
-                    showMessage("Error","Please fill the all fields to Updating");
+                    showMessage("Error","Please Select Progress");
                     return;
                 }
 
@@ -150,20 +166,24 @@ public class ModifyActivity extends AppCompatActivity {
                 String pfb = radioButton.getText().toString();
 
                 if(pfb.isEmpty() ){
-                    showMessage("Error","Please fill the all fields to Updating");
+                    showMessage("Error","Please Select Priority");
                     return;
                 }
 
+                selectedItem= tg.getCheckedRadioButtonId();
+                radioButton= findViewById (selectedItem);
+                String tgb = radioButton.getText().toString();
+
+                if(tgb.isEmpty() ){
+                    showMessage("Error","Please Select Training Group");
+                    return;
+                }
                 boolean isUpdatedR;
                 String time = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.LONG).format(new Date());
-                if(spinnerTouched){
-                    isUpdatedR = myDB.insertRecord(name.getText().toString(),time,"0","0",tg,"1",pgb,"1",pfb,"1");
-                }else{
-                    isUpdatedR = myDB.insertRecord(name.getText().toString(),time,"0","0",tg,"0",pgb,"1",pfb,"1");
-                }
+                isUpdatedR = myDB.insertRecord(name.getText().toString(),time,"0","0",tgb,"1",pgb,"1",pfb,"1");
 
 
-                boolean isUpdated = myDB.updateData(id,name.getText().toString(), tg, pgb,pfb);
+                boolean isUpdated = myDB.updateData(id,name.getText().toString(), tgb, pgb,pfb);
 
 
                 if(isUpdated && isUpdatedR ){
@@ -172,9 +192,12 @@ public class ModifyActivity extends AppCompatActivity {
                     Toast.makeText(ModifyActivity.this, "Data Not Updated", Toast.LENGTH_SHORT).show();
                 }
 
+                Intent myIntent = new Intent(ModifyActivity.this, MainActivity.class);
+                myIntent.putExtra("User", username);
+                ModifyActivity.this.startActivity(myIntent);
+
             }
         });
-
 
 
         btnDeleteData.setOnClickListener(new View.OnClickListener() {
@@ -206,6 +229,10 @@ public class ModifyActivity extends AppCompatActivity {
                     Toast.makeText(ModifyActivity.this, "Data Not Deleted", Toast.LENGTH_SHORT).show();
                 }
                 name.setText("");
+
+                Intent myIntent = new Intent(ModifyActivity.this, MainActivity.class);
+                myIntent.putExtra("User", username);
+                ModifyActivity.this.startActivity(myIntent);
             }
         });
 
@@ -213,6 +240,7 @@ public class ModifyActivity extends AppCompatActivity {
         String sname = intent.getStringExtra("name");
         String stg = intent.getStringExtra("tg");
         String sid = intent.getStringExtra("id");
+        username = intent.getStringExtra("User");
         if(!sid.isEmpty()){
             id = Integer.parseInt(intent.getStringExtra("id"));
         }
@@ -220,11 +248,11 @@ public class ModifyActivity extends AppCompatActivity {
             name.setText(sname);
         }
         if(!stg.isEmpty()){
-            if(stg.equals("Dressmaking")){
-                spinner.setSelection(0);
-            }else{
-                spinner.setSelection(1);
-            }
+//            if(stg.equals("Dressmaking")){
+//                spinner.setSelection(0);
+//            }else{
+//                spinner.setSelection(1);
+//            }
 
         }
 

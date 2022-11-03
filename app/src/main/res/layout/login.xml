@@ -38,28 +38,46 @@
         android:layout_below="@+id/header_image"
         android:layout_centerHorizontal="true">
 
-        <EditText
-            android:id="@+id/textUserName"
-            android:elevation="10dp"
-            android:layout_width="300dp"
+
+        <LinearLayout
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="-10dp"
+            android:elevation="10dp"
+            android:orientation="horizontal"
             android:layout_gravity="center"
-            android:background="@drawable/border"
-            android:ems="10"
-            android:hint=" Enter User Name... "
-            android:padding="5dp"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:padding="5dp">
+
+            <ImageView
+                android:id="@+id/entername"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/name" />
+
+            <EditText
+                android:id="@+id/textUserName"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/border"
+                android:elevation="10dp"
+                android:ems="10"
+                android:padding="5dp"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/Login"
             android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
             android:layout_gravity="center"
             android:elevation="40dp"
-            android:text="Log in"/>
+            android:background="@drawable/log" />
 
 
     </LinearLayout>

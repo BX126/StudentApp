@@ -29,49 +29,50 @@
         android:id="@+id/TopBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/header_image"
         android:layout_marginTop="7dp"
-        android:orientation="horizontal"
-        android:layout_below="@+id/header_image">
+        android:orientation="horizontal">
 
         <Button
-            android:id="@+id/Add"
-            android:layout_width="80px"
-            android:layout_height="80px"
-            android:elevation="40dp"
-            android:background="@android:drawable/ic_menu_add"/>
+            android:id="@+id/Back"
+            android:layout_width="31dp"
+            android:layout_height="31dp"
+            android:background="@drawable/backicon"
+            android:elevation="40dp" />
 
         <Button
             android:id="@+id/dmP"
-            android:layout_width="400px"
-            android:layout_height="100px"
-            android:layout_marginStart="5dp"
-            android:text="Dress Making"
-            android:elevation="40dp"
-            />
+            android:layout_width="68dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="75dp"
+            android:background="@drawable/dm"
+            android:elevation="40dp" />
 
         <Button
             android:id="@+id/ceP"
-            android:layout_width="400px"
-            android:layout_height="100px"
-            android:layout_marginStart="5dp"
-            android:text="Civic Education"
-            android:elevation="40dp"
-            />
+            android:layout_width="74dp"
+            android:layout_height="69dp"
+            android:layout_marginStart="55dp"
+            android:background="@drawable/cv"
+            android:elevation="40dp" />
 
-        <Button
-            android:id="@+id/Sync"
-            android:layout_width="80px"
-            android:layout_height="80px"
-            android:layout_marginStart="5dp"
-            android:elevation="40dp"
-            android:background="@android:drawable/ic_menu_save"/>
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:id="@+id/line"
+        android:layout_height="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_below="@id/TopBar"
+        android:background="@android:color/white"/>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv"
+        android:layout_marginTop="2dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/TopBar"
+        android:layout_below="@id/line"
         android:scrollbars="vertical" />
 
 

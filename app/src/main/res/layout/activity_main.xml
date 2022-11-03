@@ -137,18 +137,18 @@
         android:id="@+id/textPriority"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="17dp"
         android:layout_below="@id/textPG"
-        android:orientation="horizontal"
+        android:layout_marginTop="17dp"
         android:background="@drawable/border"
-        android:padding="4dp"
-        android:elevation="10dp">
+        android:elevation="10dp"
+        android:orientation="horizontal"
+        android:padding="4dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Priority:"
             android:layout_marginStart="5dp"
+            android:text="Priority:"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -162,16 +162,16 @@
                 android:id="@+id/high"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="High"
                 android:layout_marginStart="5dp"
+                android:text="High"
                 android:textSize="20sp" />
 
             <RadioButton
                 android:id="@+id/mid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mid"
                 android:layout_marginStart="5dp"
+                android:text="Mid"
                 android:textSize="20sp" />
 
             <RadioButton
@@ -180,8 +180,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:text="Low"
-                android:textSize="20sp"
-                />
+                android:textSize="20sp" />
+
         </RadioGroup>
     </LinearLayout>
 

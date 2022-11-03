@@ -37,9 +37,11 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
     }
 
     List<Person> persons;
+    String userName;
 
-    RVAdapter(List<Person> persons){
+    RVAdapter(List<Person> persons, String userName){
         this.persons = persons;
+        this.userName = userName;
     }
 
     @Override
@@ -88,6 +90,7 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder> 
                 intent.putExtra("name",Sname);
                 intent.putExtra("tg",Stg);
                 intent.putExtra("id",id);
+                intent.putExtra("User",userName);
                 view.getContext().startActivity(intent);
             }
         });

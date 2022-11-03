@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -22,15 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,12 +34,9 @@ public class MainActivity extends Activity {
     private RecyclerView rv;
     private String userName;
 
-
-    Button btnDm, btnCe, btnAdd, btnSync;
+    Button btnDm, btnCe, btnBack;
     DatabaseHelper myDB;
     FirebaseFirestore cloudDB;
-    FirebaseStorage cloudStore;
-    ImageView logo;
 
 
     @Override
@@ -56,7 +45,6 @@ public class MainActivity extends Activity {
 
         myDB = new DatabaseHelper(this);
         cloudDB = FirebaseFirestore.getInstance();
-        cloudStore = FirebaseStorage.getInstance("gs://studentapp-b2c44.appspot.com");
 
         setContentView(R.layout.recyclerview_activity);
         rv = (RecyclerView) findViewById(R.id.rv);
@@ -66,14 +54,14 @@ public class MainActivity extends Activity {
 
         btnDm = findViewById(R.id.dmP);
         btnCe = findViewById(R.id.ceP);
-        btnAdd = findViewById(R.id.Add);
-        btnSync = findViewById(R.id.Sync);
-        logo = findViewById(R.id.header_image);
+        btnBack = findViewById(R.id.Back);
 
-        logo.setOnClickListener(new View.OnClickListener() {
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent myIntent = new Intent(MainActivity.this, LoginActivity.class);
+                Intent myIntent = new Intent(MainActivity.this, HomeActivity.class);
+                myIntent.putExtra("User", userName);
                 MainActivity.this.startActivity(myIntent);
             }
         });
@@ -91,77 +79,14 @@ public class MainActivity extends Activity {
             }
         });
 
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent myIntent = new Intent(MainActivity.this, ModifyActivity.class);
-                myIntent.putExtra("name", "");
-                myIntent.putExtra("tg", "");
-                myIntent.putExtra("id", "");
-                MainActivity.this.startActivity(myIntent);
-            }
-        });
-
-        btnSync.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                ArrayList<String> output = new ArrayList<>();
-                Cursor curCSV = myDB.getAllRecord();
-                if (curCSV.getCount() == 0) {
-                    showMessage("Error", "No Data Found");
-                    return;
-                }
-                while (curCSV.moveToNext()) {
-                    String temp = curCSV.getString(1) +","+curCSV.getString(2)+","+ curCSV.getString(3)+","+curCSV.getString(4)+","+curCSV.getString(5)+","+curCSV.getString(6)+","+curCSV.getString(7)+","+curCSV.getString(8)+","+curCSV.getString(9)+"\n";
-                    output.add(temp);
-                }
-                curCSV.close();
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                DataOutputStream out = new DataOutputStream(baos);
-
-                for (String element : output) {
-                    try {
-                        out.writeUTF(element);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                byte[] data = baos.toByteArray();
-
-                StorageReference storageRef = cloudStore.getReference();
-                String time = java.text.DateFormat.getDateTimeInstance().format(new Date());
-                Intent intent = new Intent(getIntent());
-                userName = intent.getStringExtra("User");
-                String name = userName+ "/" + time+ ".csv";
-                StorageReference mountainsRef = storageRef.child(name);
-                UploadTask uploadTask = mountainsRef.putBytes(data);
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                        // ...
-                    }
-                });
-
-            }
-
-        });
-
-
-
+        Intent intent = new Intent(getIntent());
+        userName = intent.getStringExtra("User");
         initializeData();
         viewByDM();
 
-        if(isNetworkAvailable()){
-            sendDataToCloud(cloudDB);
-        }
+//        if(isNetworkAvailable()){
+//            sendDataToCloud(cloudDB);
+//        }
 
     }
 
@@ -250,7 +175,7 @@ public class MainActivity extends Activity {
 
 
     private void initializeAdapter(List<Person> input) {
-        RVAdapter adapter = new RVAdapter(input);
+        RVAdapter adapter = new RVAdapter(input, userName);
         rv.setAdapter(adapter);
     }
 
